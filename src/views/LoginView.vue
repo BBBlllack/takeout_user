@@ -6,8 +6,8 @@
         <van-field
           v-model="form.phone"
           left-icon="user-o"
-          label="用户名"
-          placeholder="请输入用户名"
+          label="手机号"
+          placeholder="请输入手机号"
         />
         <van-field
           v-model="form.password"

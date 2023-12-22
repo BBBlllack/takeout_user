@@ -84,7 +84,7 @@ interface orderPage extends pageType {
 const orderList = ref<orderPage>({
   records: [] as orderListItemType[],
   total: 20,
-  current: 0,
+  current: 1,
   size: 10
 })
 

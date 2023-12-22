@@ -108,9 +108,9 @@
           finished-text="没有更多了"
           @load="onLoadCart"
         >
-          <van-cell v-for="item in cartData" :key="item.id" v-show="item.amount != 0">
+          <van-cell v-for="item in cartData" :key="item.id" v-show="item.quantity != 0">
             <van-card
-              :price="(item.dish?.price! * (1 - item.dish?.discount!) * item.amount!).toFixed(2)"
+              :price="(item.dish?.price! * (1 - item.dish?.discount!) * item.quantity!).toFixed(2)"
               :desc="item.dish?.descr"
               :title="item.dish?.name"
               :thumb="item.dish?.cover"
@@ -119,7 +119,7 @@
                 <van-stepper
                   integer
                   min="0"
-                  v-model="item.amount"
+                  v-model="item.quantity"
                   :before-change="cartNumberChange"
                 />
               </template>
@@ -168,8 +168,7 @@ import {
   getDishList,
   getCartList,
   updateCartList,
-  updateAddressStatus,
-  addAddress,
+  updateAddress,
   getAddressList,
   addOrder
 } from '@/api'
@@ -253,9 +252,10 @@ const onSaveAddr = async (e: AddressEditInfo) => {
     detail: e.addressDetail!,
     status: 1
   }
-  const res = await addAddress(address)
+  const res = await updateAddress(address)
   if (res) {
     showSuccessToast('保存成功')
+    refreshAddressList()
     popup_switch.value = 1
   } else {
     showFailToast('保存失败')
@@ -266,7 +266,15 @@ const onSaveAddr = async (e: AddressEditInfo) => {
 const onDeleteAddr = async (e: AddressItem) => {
   // showToast('删除地址')
   console.log(e)
-  const res = await updateAddressStatus(e.id!, 0)
+  // 构造一个addressType对象
+  const address: addressType = {
+    id: e.id!,
+    name: e.name!,
+    phone: e.tel!,
+    detail: e.address!,
+    status: 0
+  }
+  const res = await updateAddress(address)
   if (res) {
     showSuccessToast('删除成功')
     refreshAddressList()
@@ -388,8 +396,8 @@ const onLoadDish = async () => {
   // 更新页码
   dishList.value.current++
   const res = await getDishList(
-    categoryData.value[activeCategory.value].id!,
     restaurantData.value.id!,
+    categoryData.value[activeCategory.value].id!,
     dishList.value.current,
     dishList.value.size
   )
@@ -408,17 +416,16 @@ const getDishListData = async (categoryId: number, restaurantId: number) => {
   console.log('getDishListData')
   // 重置加载状态
   dishLoading.value = true
-  const res = await getDishList(
-    restaurantId,
-    categoryId,
-    dishList.value.current,
-    dishList.value.size
-  )
+  const res = await getDishList(restaurantId, categoryId, 1, 10)
   console.log(res)
   // 重置列表数据
   dishList.value = res
   // 加载完毕
-  dishLoading.value = false
+  if (dishList.value.records.length >= dishList.value.total) {
+    dishFinished.value = true
+  } else {
+    dishFinished.value = false
+  }
 }
 
 // ########## 购物车
@@ -448,7 +455,8 @@ const onClickAddToCart = async (item: dishType) => {
   // 构造一个shopCarItemType对象
   const shopCarItem: shopCarItemType = {
     did: item.id!,
-    amount: 1
+    quantity: 1,
+    rid: restaurantData.value.id!
   }
   const res = await updateCartList([shopCarItem])
   if (res) {

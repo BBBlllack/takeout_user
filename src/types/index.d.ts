@@ -11,7 +11,7 @@
 // 用户类型
 export interface userType {
   id?: number
-  name?: string
+  username?: string
   phone?: string
   avatar?: string
   regtime?: string
@@ -158,7 +158,8 @@ export interface shopCarType {
   id?: number
   uid?: number
   did?: number
-  amount?: number
+  rid?: number
+  quantity?: number
 }
 
 // 购物车项目详情
@@ -199,7 +200,6 @@ export interface orderListItemType {
   user: userType
   restaurant: restaurantType
   address: addressType
-  time?: string
   status?: number
   totalprice?: number
   create_time?: string

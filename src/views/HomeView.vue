@@ -1,10 +1,11 @@
 <template>
   <van-sticky>
     <van-search
-      v-model="value"
+      v-model="searchKey"
       shape="round"
       background="linear-gradient(to right, #FFCA58, #F3511D)"
       placeholder="请输入搜索关键词"
+      @search="onSearch"
     />
   </van-sticky>
   <div class="list">
@@ -58,7 +59,7 @@ import { getRestaurantList } from '@/api'
 import { onMounted } from 'vue'
 import router from '@/router'
 
-const value = ref('')
+const searchKey = ref('')
 const images = ref([
   'https://fastly.jsdelivr.net/npm/@vant/assets/apple-1.jpeg',
   'https://fastly.jsdelivr.net/npm/@vant/assets/apple-2.jpeg'
@@ -95,10 +96,21 @@ const onLoad = async () => {
   loading.value = false
 }
 
+// 搜索店家名称
+const onSearch = async (value: string) => {
+  finished.value = false
+  loading.value = true
+  console.log(value)
+  // 根据店家名称搜索
+  const res = await getRestaurantList(1, 10, value)
+  resturantData.value = res
+  loading.value = false
+}
+
 // 刷新店家列表
 const refresh = async () => {
   loading.value = true
-  const res = await getRestaurantList(1, 10)
+  const res = await getRestaurantList(1, 10, searchKey.value)
   resturantData.value = res
   loading.value = false
 }

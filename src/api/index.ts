@@ -25,7 +25,7 @@ export async function login(data: loginType) {
     showFailToast('密码不能为空')
     return
   }
-  const res: responseType = await instance.post('/login', data)
+  const res: responseType = await instance.post('/user/login', data)
   const resData: loginResType = res.data
   if (res.code === 1) {
     showSuccessToast('登陆成功')
@@ -59,12 +59,13 @@ export async function updateUserInfo(data: userType) {
 }
 
 // 获取饭店列表
-export async function getRestaurantList(page: number, pagesize: number) {
+export async function getRestaurantList(page: number, pagesize: number, key?: string) {
   console.log('获取饭店列表')
-  const res: responseType = await instance.get('/restaurant/list', {
+  const res: responseType = await instance.get('/rest/user/list', {
     params: {
       page: page,
-      pagesize: pagesize
+      size: pagesize,
+      key: key
     }
   })
   if (res.code === 0) {
@@ -76,7 +77,7 @@ export async function getRestaurantList(page: number, pagesize: number) {
 
 // 获取饭店信息
 export async function getRestaurantInfo(id: number) {
-  const res: responseType = await instance.get('/restaurant/info', {
+  const res: responseType = await instance.get('/rest/info', {
     params: {
       id: id
     }
@@ -90,12 +91,12 @@ export async function getRestaurantInfo(id: number) {
 
 // 根据饭店id和分类id获取饭店菜品列表
 export async function getDishList(rid: number, cid: number, page: number, pagesize: number) {
-  const res: responseType = await instance.get('/dish/list', {
+  const res: responseType = await instance.get('/dish/user/list', {
     params: {
       rid: rid,
       cid: cid,
       page: page,
-      pagesize: pagesize
+      size: pagesize
     }
   })
   if (res.code === 0) {
@@ -108,7 +109,7 @@ export async function getDishList(rid: number, cid: number, page: number, pagesi
 // 获取分类列表
 export async function getCategoryList(rid: number) {
   // console.log('获取分类列表')
-  const res: responseType = await instance.get('/category/list', {
+  const res: responseType = await instance.get('/category/user/list', {
     params: {
       rid: rid
     }
@@ -155,23 +156,10 @@ export async function getAddressList() {
 }
 
 // 更新地址状态
-export const updateAddressStatus = async (id: number, status: number) => {
-  const res: responseType = await instance.post('/address/update', {
-    id: id,
-    status: status
-  })
+export const updateAddress = async (data: addressType) => {
+  const res: responseType = await instance.post('/address/update', data)
   if (res.code === 0) {
-    showFailToast(res.msg || '地址状态更新失败')
-    return false
-  }
-  return true
-}
-
-// 添加地址
-export const addAddress = async (data: addressType) => {
-  const res: responseType = await instance.post('/address/add', data)
-  if (res.code === 0) {
-    showFailToast(res.msg || '地址添加失败')
+    showFailToast(res.msg || '地址更新失败')
     return false
   }
   return true
@@ -179,7 +167,7 @@ export const addAddress = async (data: addressType) => {
 
 // 下单!!!
 export const addOrder = async (rid: number, aid: number, cart: number[]) => {
-  const res: responseType = await instance.post('/order/add', {
+  const res: responseType = await instance.post('/order/submit', {
     rid: rid,
     aid: aid,
     cart: cart
@@ -209,10 +197,10 @@ export async function getOrderList(
     end = undefined
   }
   console.log(page, pagesize, key)
-  const res: responseType = await instance.get('/order/list', {
+  const res: responseType = await instance.get('/order/user/list', {
     params: {
       page: page,
-      pagesize: pagesize,
+      size: pagesize,
       key: key,
       begin: begin,
       end: end
@@ -228,7 +216,7 @@ export async function getOrderList(
 
 // 获取订单详情
 export async function getOrderDetail(id: number) {
-  const res: responseType = await instance.get('/order/detail', {
+  const res: responseType = await instance.get('/order/user/detail', {
     params: {
       id: id
     }

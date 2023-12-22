@@ -27,7 +27,7 @@
         <van-form @submit="onSubmit">
           <van-cell>
             <van-field
-              v-model="userData.name"
+              v-model="userData.username"
               name="name"
               label="用户名"
               placeholder="不修改用户名请留空"
@@ -119,7 +119,7 @@ const afterRead = async (file: any) => {
 
 const userData = ref<userType>({
   id: 0,
-  name: '',
+  username: '',
   phone: '',
   password: '',
   avatar: 'https://img.yzcdn.cn/vant/leaf.jpg',
